@@ -692,6 +692,10 @@ async function handleImageUpload(event) {
     });
 
     const data = await resp.json();
+    console.log('OCR response:', JSON.stringify(data));
+    if (data.IsErroredOnProcessing) {
+      throw new Error(data.ErrorMessage?.[0] || '识别出错');
+    }
     const text = data.ParsedResults?.[0]?.ParsedText || '';
     const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean);
 
