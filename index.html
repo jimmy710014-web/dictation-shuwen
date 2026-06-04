@@ -338,7 +338,6 @@
   /* Divider */
   .divider { width: 1px; height: 28px; background: var(--border); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -677,23 +676,24 @@ async function handleImageUpload(event) {
 
   const ocrEl = document.getElementById('ocrStatus');
   ocrEl.style.color = 'var(--text-2)';
-  ocrEl.textContent = '正在加载识别引擎...';
+  ocrEl.textContent = '正在识别图片文字...';
   document.getElementById('uploadIcon').textContent = '⏳ 识别中...';
 
   try {
-    const { createWorker } = Tesseract;
-    const worker = await createWorker('chi_sim+eng', 1, {
-      logger: m => {
-        if (m.status === 'recognizing text') {
-          ocrEl.textContent = `识别中 ${Math.round(m.progress * 100)}%`;
-        }
-      }
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('apikey', 'K84928601088957');
+    formData.append('language', 'chs');
+    formData.append('isOverlayRequired', 'false');
+
+    const resp = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      body: formData
     });
 
-    const { data: { text } } = await worker.recognize(file);
-    await worker.terminate();
-
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const data = await resp.json();
+    const text = data.ParsedResults?.[0]?.ParsedText || '';
+    const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean);
 
     if (lines.length) {
       const textarea = document.getElementById('wordList');
