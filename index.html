@@ -710,7 +710,7 @@ async function handleImageUpload(event) {
     const formData = new FormData();
     formData.append('base64Image', base64);
     formData.append('apikey', 'K84928601088957');
-    formData.append('language', 'chs');
+    formData.append('language', 'chs,eng');
     formData.append('isOverlayRequired', 'false');
 
     const resp = await fetch('https://api.ocr.space/parse/image', {
