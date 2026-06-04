@@ -680,8 +680,15 @@ async function handleImageUpload(event) {
   document.getElementById('uploadIcon').textContent = '⏳ 识别中...';
 
   try {
+    const base64 = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('base64Image', base64);
     formData.append('apikey', 'K84928601088957');
     formData.append('language', 'chs');
     formData.append('isOverlayRequired', 'false');
